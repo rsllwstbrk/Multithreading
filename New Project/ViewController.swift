@@ -7,24 +7,45 @@
 
 import UIKit
 
-
-class BankAccount {
-    func deposit() {}
-    func withdrawal() {}
-}
-
 class ViewController: UIViewController {
-    
-    var depositTimer: Timer?
-    var withdrawalTimer: Timer?
     
     let label = UILabel()
     let balanceLabel = UILabel()
-
+    
+    let lock = NSLock()
     var balance = 0
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        
+        let depositThread = Thread {
+            depositMethod()
+            }
+        DispatchQueue.main.asyncAfter(deadline: .now() + 3) {
+            depositThread.start()
+        }
+        
+        
+        
+        let withdrawalThread = Thread {
+            withdrawalMethod()
+        }
+        DispatchQueue.main.asyncAfter(deadline: .now() + 7) {
+            withdrawalThread.start()
+        }
+        
+        func depositMethod() {
+            lock.lock()
+            balance += 20
+            lock.unlock()
+        }
+        
+        func withdrawalMethod() {
+            lock.lock()
+            balance -= 10
+            lock.unlock()
+        }
+
         
         self.view.addSubview(label)
         label.text = "Current Balance:"
@@ -39,17 +60,9 @@ class ViewController: UIViewController {
         balanceLabel.centerYAnchor.constraint(equalTo: self.view.centerYAnchor).isActive = true
         
         
-        depositTimer = Timer(timeInterval: 2, repeats: true, block: { depositTimer in
-                self.balance += 4
-                self.balanceLabel.text = "\(self.balance)$"
-            })
-        RunLoop.main.add(depositTimer!, forMode: .default)
         
-        withdrawalTimer = Timer(timeInterval: 7, repeats: true, block: { depositTimer in
-                self.balance -= 10
-                self.balanceLabel.text = "\(self.balance)$"
-            })
-        RunLoop.main.add(withdrawalTimer!, forMode: .default)
+        
+        
         
     }
 
