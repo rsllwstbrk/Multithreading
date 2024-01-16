@@ -7,42 +7,60 @@
 
 import UIKit
 
+class BankAccount {
+    
+    var balance = 0
+    
+    func deposit () {
+        balance += 20
+    }
+    
+    func withdrawal () {
+        balance -= 10
+    }
+    
+    
+}
+
 class ViewController: UIViewController {
+    
+    let bankAccount = BankAccount()
+    
     
     let label = UILabel()
     let balanceLabel = UILabel()
     
     let lock = NSLock()
-    var balance = 0
     
     override func viewDidLoad() {
         super.viewDidLoad()
         
+        
         let depositThread = Thread {
-            depositMethod()
+            deposit()
+            return deposit()
             }
-        DispatchQueue.main.asyncAfter(deadline: .now() + 3) {
             depositThread.start()
-        }
         
         
         
         let withdrawalThread = Thread {
-            withdrawalMethod()
+            withdrawal()
+            return withdrawal()
         }
-        DispatchQueue.main.asyncAfter(deadline: .now() + 7) {
             withdrawalThread.start()
-        }
         
-        func depositMethod() {
+        
+        
+        func deposit() {
             lock.lock()
-            balance += 20
+            bankAccount.deposit()
             lock.unlock()
         }
         
-        func withdrawalMethod() {
+        func withdrawal() {
             lock.lock()
-            balance -= 10
+            bankAccount.withdrawal()
             lock.unlock()
         }
 
@@ -54,7 +72,7 @@ class ViewController: UIViewController {
         label.centerYAnchor.constraint(equalTo: self.view.centerYAnchor, constant: -22).isActive = true
         
         self.view.addSubview(balanceLabel)
-        balanceLabel.text = "\(balance)$"
+        balanceLabel.text = "\(bankAccount.balance)$"
         balanceLabel.translatesAutoresizingMaskIntoConstraints = false
         balanceLabel.centerXAnchor.constraint(equalTo: self.view.centerXAnchor).isActive = true
         balanceLabel.centerYAnchor.constraint(equalTo: self.view.centerYAnchor).isActive = true
