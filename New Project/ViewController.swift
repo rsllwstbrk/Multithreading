@@ -7,25 +7,25 @@
 
 import UIKit
 
-//class BankAccount {
-//    
-//    var balance = 0
-//    
-//    func deposit () {
-//        balance += 20
-//    }
-//    
-//    func withdrawal () {
-//        balance -= 10
-//    }
-//    
-//}
+class BankAccount {
+    
+    var balance = 0
+    
+    func deposit () {
+        balance += 20
+    }
+    
+    func withdrawal () {
+        balance -= 10
+    }
+    
+}
 
 class ViewController: UIViewController {
     
-//    let bankAccount = BankAccount()
-//    
-//    
+    let bankAccount = BankAccount()
+    
+    
     let label = UILabel()
     let balanceLabel = UILabel()
 //    
@@ -33,8 +33,6 @@ class ViewController: UIViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        
-        var balance = 0
         
         let concurrentQueue = DispatchQueue(label: "Bank Account Balance", attributes: .concurrent)
 //        concurrentQueue.async {
@@ -46,13 +44,13 @@ class ViewController: UIViewController {
         
         
         let depositItem = DispatchWorkItem {
-            balance += 20
+            self.bankAccount.deposit()
         }
         depositItem.notify(queue: .main) {
-            print ("\(balance)$")
+            print ("\(self.bankAccount.balance)$")
         }
         let withdrawalItem = DispatchWorkItem {
-            balance -= 10
+            self.bankAccount.withdrawal()
         }
         
         concurrentQueue.async(execute: depositItem)
@@ -93,7 +91,7 @@ class ViewController: UIViewController {
         label.centerYAnchor.constraint(equalTo: self.view.centerYAnchor, constant: -22).isActive = true
         
         self.view.addSubview(balanceLabel)
-        balanceLabel.text = "\(balance)$"
+        balanceLabel.text = "\(bankAccount.balance)$"
         balanceLabel.translatesAutoresizingMaskIntoConstraints = false
         balanceLabel.centerXAnchor.constraint(equalTo: self.view.centerXAnchor).isActive = true
         balanceLabel.centerYAnchor.constraint(equalTo: self.view.centerYAnchor).isActive = true
