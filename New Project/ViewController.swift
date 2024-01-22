@@ -10,13 +10,17 @@ import UIKit
 class BankAccount {
     
     var balance = 0
+    let concurrentQueue = DispatchQueue(label: "Bank Account Balance", attributes: .concurrent)
     
     func deposit () {
-        balance += 20
+        concurrentQueue.async {
+            self.balance += 20}
     }
     
     func withdrawal () {
-        balance -= 10
+        concurrentQueue.async {
+            self.balance -= 10
+        }
     }
     
 }
@@ -34,7 +38,7 @@ class ViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        let concurrentQueue = DispatchQueue(label: "Bank Account Balance", attributes: .concurrent)
+        
 //        concurrentQueue.async {
 //            balance += 20
 //        }
@@ -43,18 +47,14 @@ class ViewController: UIViewController {
 //        }
         
         
-        let depositItem = DispatchWorkItem {
-            self.bankAccount.deposit()
-        }
-        depositItem.notify(queue: .main) {
-            print ("\(self.bankAccount.balance)$")
-        }
-        let withdrawalItem = DispatchWorkItem {
-            self.bankAccount.withdrawal()
-        }
         
-        concurrentQueue.async(execute: depositItem)
-        concurrentQueue.async(execute: withdrawalItem)
+        
+        DispatchQueue.concurrentPerform(iterations: 5, execute: {_ in 
+            bankAccount.deposit()
+        })
+        DispatchQueue.concurrentPerform(iterations: 4, execute: {_ in 
+            bankAccount.withdrawal()
+        })
 //        let depositThread = Thread {
 //            deposit()
 //            return deposit()
